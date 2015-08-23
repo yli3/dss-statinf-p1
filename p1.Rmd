@@ -85,10 +85,20 @@ A visual way of comparing a distribution to normal is possible by considering a 
   qqnorm(y.means); qqline(y.means)
 ```
 
-Finally, let's simply look at the distribution itself by considering a density plot of `y.means`, with the theoretical (and normal) sampling distribution of the mean overlayed[^1].
+Finally, let's simply look at the distribution itself by considering a density plot of `y.means`, with the theoretical (and normal) sampling distribution of the mean overlayed[^1]. Mean and sd lines for both are drawn.
 
 ```{r plot_density_vs_normal, echo = FALSE}
   library(ggplot2)
+  # Auxiliary lines
+  auxlines <- data.frame(
+    "distr" = c("normal", "normal", "normal", "y.means", "y.means", "y.means"),
+    "value" = c(
+      5, 5 + sqrt(25/40), 5 - sqrt(25/40),
+      mean(y.means), 
+      mean(y.means) + sqrt(var(y.means)), 
+      mean(y.means) - sqrt(var(y.means))
+    )
+  )
   # Density plot of y.means
   ggplot(data.frame(mean = y.means), aes(x = mean)) +
     geom_density(aes(colour = "y.means")) + 
@@ -97,18 +107,14 @@ Finally, let's simply look at the distribution itself by considering a density p
       aes(colour = "normal"),
       args = list(mean = 5, sd = sqrt(25/40))
     ) +
-    geom_vline(xintercept = 5, 
-      colour = "#dd8844", linetype = "dashed", size = 1.5) +
-    geom_vline(xintercept = mean(y.means), 
-      colour = "#44aadd", linetype = "dashed", size = 1.5) +
-    geom_vline(xintercept = 5 + sqrt(25/40),
-      colour = "#dd8844", linetype = "dashed", size = 1.5) +
-    geom_vline(xintercept = 5 - sqrt(25/40),
-      colour = "#dd8844", linetype = "dashed", size = 1.5) +
-    geom_vline(xintercept = mean(y.means) + sqrt(var(y.means)),
-      colour = "#44aadd", linetype = "dashed", size = 1.5) +
-    geom_vline(xintercept = mean(y.means) - sqrt(var(y.means)),
-      colour = "#44aadd", linetype = "dashed", size = 1.5)
+    geom_vline(data = auxlines,
+      aes(xintercept = value,
+        colour = distr
+      ), 
+      linetype = "dotted",
+      size = 1.2
+    ) +
+    labs (x = "value", y = "density\n", title = "y.means vs normal\n") 
 ```
 
 [^1]: Code for this plot uses **R**'s `ggplot2` library and is included in the appendix.
